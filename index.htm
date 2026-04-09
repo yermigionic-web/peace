@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>다정 — Character Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Orbitron:wght@400;700&family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  :root{
+    --blue-dark:#0a1a6b;--blue-mid:#1a3a9a;--blue-light:#4a7fd4;--blue-glow:#7ab8ff;
+    --cyan:#00e5ff;--silver:#c8d8f0;--silver2:#8aa8d0;--white:#f0f4ff;
+    --win-btn:#2255bb;--win-title-start:#0844c4;--win-title-end:#3a8aee;--win-border:#5588cc;
+    --scanline:rgba(0,0,0,0.08);
+    --font-dos:'VT323',monospace;--font-mono:'Share Tech Mono',monospace;
+    --font-orb:'Orbitron',sans-serif;--font-kr:'Nanum Gothic Coding',monospace;
+  }
+  html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var(--font-kr)}
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,var(--scanline) 0px,var(--scanline) 1px,transparent 1px,transparent 3px);animation:scanMove 8s linear infinite}
+  @keyframes scanMove{0%{background-position:0 0}100%{background-position:0 300px}}
+  .screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center}
+  .screen.active{display:flex}
+
+  /* ── LOGIN ── */
+  #s-login{background:radial-gradient(ellipse at 50% 40%,#0a2070 0%,#040d35 60%,#000510 100%)}
+  .login-stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+  .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite}
+  @keyframes twinkle{0%,100%{opacity:.1}50%{opacity:var(--op,.8)}}
+  .login-top-bar{position:absolute;top:0;left:0;right:0;height:28px;background:linear-gradient(90deg,#0a1560,#0e2a8a,#0a1560);border-bottom:1px solid var(--blue-glow);display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-family:var(--font-mono);font-size:10px;color:var(--blue-glow)}
+  .blink{animation:blink .8s step-end infinite}
+  @keyframes blink{50%{opacity:0}}
+  .login-os-title{font-family:var(--font-dos);font-size:28px;color:var(--blue-glow);letter-spacing:4px;text-shadow:0 0 20px var(--blue-glow),0 0 40px #4488ff;margin-bottom:8px;text-align:center}
+  .login-os-sub{font-family:var(--font-mono);font-size:11px;color:var(--silver2);letter-spacing:2px;margin-bottom:32px;text-align:center}
+
+  /* Music Player */
+  .music-player{width:280px;margin-bottom:16px;background:linear-gradient(180deg,#1a2a6a 0%,#0d1a4a 100%);border:1px solid var(--win-border);border-radius:4px;box-shadow:0 0 0 1px #0a1030,inset 0 1px 0 rgba(255,255,255,0.1)}
+  .mp-title-bar{height:22px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;background:linear-gradient(90deg,var(--win-title-start),var(--win-title-end));border-radius:4px 4px 0 0}
+  .mp-title-bar span{font-family:var(--font-mono);font-size:10px;color:#fff;letter-spacing:1px}
+  .mp-title-bar .win-btn-grp{display:flex;gap:3px}
+  .win-btn-sm{width:16px;height:14px;border-radius:2px;border:1px solid rgba(255,255,255,0.4);background:linear-gradient(180deg,#5580cc,#2244aa);font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono)}
+  .mp-body{padding:10px 12px}
+  .mp-track{font-family:var(--font-dos);font-size:16px;color:var(--cyan);letter-spacing:1px;margin-bottom:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .mp-track-sub{font-family:var(--font-mono);font-size:9px;color:var(--silver2);margin-bottom:10px}
+  .mp-progress{height:4px;background:#0a1540;border:1px solid #2244aa;border-radius:2px;margin-bottom:8px;cursor:pointer;position:relative}
+  .mp-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue-glow),var(--cyan));width:0%;transition:width .1s}
+  .mp-controls{display:flex;align-items:center;justify-content:space-between}
+  .mp-ctrl-btns{display:flex;gap:8px}
+  .mp-btn{font-family:var(--font-dos);font-size:18px;color:var(--silver);cursor:pointer;padding:2px 6px;border:1px solid #2a4a88;border-radius:3px;background:linear-gradient(180deg,#223370,#121e50);transition:all .1s}
+  .mp-btn:active{background:linear-gradient(180deg,#1a2860,#0d163a);transform:scale(0.95)}
+  .mp-vol{display:flex;align-items:center;gap:4px}
+  .mp-vol span{font-size:9px;color:var(--silver2);font-family:var(--font-mono)}
+  .mp-vol input[type=range]{width:50px;height:3px;accent-color:var(--blue-glow);cursor:pointer}
+
+  /* Login Window */
+  .login-window{width:280px;background:linear-gradient(180deg,#1a2a6a 0%,#0d1a4a 100%);border:1px solid var(--win-border);border-radius:4px;box-shadow:0 0 0 1px #0a1030,0 8px 32px rgba(0,0,60,0.8),inset 0 1px 0 rgba(255,255,255,0.1)}
+  .login-title-bar{height:22px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;background:linear-gradient(90deg,var(--win-title-start),var(--win-title-end));border-radius:4px 4px 0 0}
+  .login-title-bar span{font-family:var(--font-mono);font-size:10px;color:#fff;letter-spacing:1px}
+  .login-body{padding:16px}
+  .login-avatar{width:52px;height:52px;border-radius:50%;border:2px solid var(--blue-glow);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a2060,#2255aa);font-size:22px;color:var(--blue-glow);box-shadow:0 0 12px var(--blue-glow);font-family:var(--font-dos)}
+  .login-name{font-family:var(--font-dos);font-size:18px;color:var(--white);text-align:center;margin-bottom:12px;letter-spacing:2px}
+  .login-input-wrap{margin-bottom:10px}
+  .login-input-wrap label{font-family:var(--font-mono);font-size:9px;color:var(--silver2);display:block;margin-bottom:3px;letter-spacing:1px}
+  .login-input{width:100%;background:#060e2a;border:1px solid var(--blue-light);color:var(--blue-glow);font-family:var(--font-dos);font-size:16px;padding:6px 8px;border-radius:2px;outline:none;box-shadow:inset 0 0 8px rgba(0,30,100,0.8);user-select:text;-webkit-user-select:text}
+  .login-input:focus{border-color:var(--cyan);box-shadow:inset 0 0 8px rgba(0,30,100,0.8),0 0 6px var(--cyan)}
+  .login-btn{width:100%;height:28px;margin-top:6px;background:linear-gradient(180deg,#3366cc,#1a3888);border:1px solid var(--win-border);border-radius:3px;font-family:var(--font-dos);font-size:18px;color:#fff;cursor:pointer;letter-spacing:2px;transition:all .1s}
+  .login-btn:active{background:linear-gradient(180deg,#1a3888,#0d1e55)}
+  .login-footer{margin-top:10px;font-family:var(--font-mono);font-size:8px;color:var(--silver2);text-align:center;letter-spacing:1px}
+  .login-dots{display:flex;gap:6px;justify-content:center;margin-top:18px}
+  .login-dot{width:6px;height:6px;border-radius:50%;background:var(--blue-mid);border:1px solid var(--blue-glow)}
+  .login-dot.active{background:var(--blue-glow);box-shadow:0 0 6px var(--blue-glow)}
+
+  /* ── DESKTOP ── */
+  #s-desktop{background:radial-gradient(ellipse at 30% 70%,#0a2a8a 0%,transparent 50%),radial-gradient(ellipse at 70% 20%,#1a4aaa 0%,transparent 45%),linear-gradient(160deg,#0a1a5a 0%,#051030 50%,#080c20 100%);justify-content:flex-end}
+  #s-desktop::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.02) 39px,rgba(255,255,255,0.02) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.02) 39px,rgba(255,255,255,0.02) 40px)}
+  .desktop-icons{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;gap:28px;align-items:flex-start;justify-content:center;flex-wrap:nowrap}
+  .desktop-icon{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;width:68px}
+  .desktop-icon:active .icon-img{transform:scale(0.92);filter:brightness(1.3)}
+  .icon-img{width:52px;height:52px;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;transition:transform .1s;border:1px solid rgba(255,255,255,0.25)}
+  .icon-label{font-family:var(--font-mono);font-size:10px;color:#d0e4ff;text-align:center;text-shadow:0 1px 4px #000,0 0 8px rgba(0,80,200,0.8);line-height:1.3;word-break:keep-all}
+  .icon-notepad{background:linear-gradient(145deg,#e8f4ff,#c0d8ff);border-color:#5588cc}
+  .icon-notepad-inner{width:32px;height:36px;background:#fff;border:1px solid #aac4ee;border-radius:1px;position:relative}
+  .icon-notepad-inner::before{content:'';position:absolute;top:6px;left:4px;right:4px;height:2px;background:#4477bb;box-shadow:0 4px 0 #4477bb,0 8px 0 #4477bb,0 12px 0 #4477bb,0 16px 0 #4477bb}
+  .icon-notepad-inner::after{content:'';position:absolute;top:0;right:0;width:0;height:0;border-left:8px solid #c0d8ff;border-bottom:8px solid transparent}
+  .icon-gallery{background:linear-gradient(145deg,#ffe8f0,#ffcce0);border-color:#dd88aa}
+  .icon-gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:32px;height:32px}
+  .icon-gallery-cell{border-radius:2px}
+  .igc1{background:#ff99bb}.igc2{background:#ffbbcc}.igc3{background:#ffccdd}.igc4{background:#ff88aa}
+  .icon-dajeong{background:linear-gradient(145deg,#1a1a4a,#0a0a2a);border-color:var(--blue-glow);box-shadow:0 0 12px rgba(0,150,255,0.4)}
+  .icon-dajeong-star{color:var(--blue-glow);font-size:24px;text-shadow:0 0 10px var(--blue-glow)}
+  .pixel-corner{position:absolute;width:6px;height:6px;background:var(--blue-glow);opacity:.6}
+  .pc-tl{top:0;left:0}.pc-tr{top:0;right:0}.pc-bl{bottom:0;left:0}.pc-br{bottom:0;right:0}
+  .taskbar{width:100%;height:36px;background:linear-gradient(180deg,#1a3a8a 0%,#0d2060 40%,#0a1a50 100%);border-top:1px solid var(--blue-light);display:flex;align-items:center;padding:0 8px;gap:8px;position:relative;z-index:10;flex-shrink:0}
+  .tb-start{height:24px;padding:0 10px;border-radius:12px;background:linear-gradient(180deg,#44aa44,#228822);border:1px solid #55cc55;font-family:var(--font-mono);font-size:10px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:4px;font-weight:700}
+  .tb-clock{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:#a0c0ff;text-align:right;line-height:1.4}
+  .tb-sep{width:1px;height:20px;background:rgba(255,255,255,0.15)}
+
+  /* ── WINDOWS ── */
+  .win-overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(0,0,20,0.4)}
+  .win-overlay.open{display:flex}
+  .win-box{width:88vw;max-width:360px;background:linear-gradient(180deg,#c8d8f0 0%,#a8c0e8 100%);border:1px solid var(--win-border);border-radius:6px;box-shadow:2px 2px 0 #0a1030,0 0 0 1px #7aacf0,inset 0 1px 0 rgba(255,255,255,0.5);overflow:hidden}
+  .win-title{height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;background:linear-gradient(90deg,#0a2aaa,#3a7aee,#0a2aaa);border-bottom:1px solid var(--win-border)}
+  .win-title-text{font-family:var(--font-mono);font-size:11px;color:#fff;letter-spacing:1px;display:flex;align-items:center;gap:5px}
+  .win-close{width:18px;height:16px;border-radius:2px;background:linear-gradient(180deg,#ee4444,#aa1111);border:1px solid #cc2222;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700}
+  .win-close:active{background:linear-gradient(180deg,#aa1111,#880000)}
+
+  /* Notepad */
+  #notepad-menu{height:20px;background:#dde8f8;border-bottom:1px solid #b0c8e8;display:flex;align-items:center;padding:0 6px;gap:12px}
+  #notepad-menu span{font-family:var(--font-mono);font-size:9px;color:#334;cursor:pointer}
+  #notepad-menu span:hover{text-decoration:underline}
+  #notepad-textarea{width:100%;height:200px;background:#f8f8ff;border:none;outline:none;resize:none;font-family:var(--font-dos);font-size:16px;color:#112;padding:8px;line-height:1.6;user-select:text;-webkit-user-select:text}
+  #notepad-statusbar{height:18px;background:#dde8f8;border-top:1px solid #b0c8e8;padding:0 6px;display:flex;align-items:center;font-family:var(--font-mono);font-size:8px;color:#556;justify-content:space-between}
+
+  /* Gallery */
+  .gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px}
+  .gallery-cell{aspect-ratio:1;background:#1a2a4a;border:1px solid #3a5a88;border-radius:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;transition:border-color .15s}
+  .gallery-cell:hover{border-color:var(--blue-glow)}
+  .gallery-cell img{width:100%;height:100%;object-fit:cover;display:block}
+  .gallery-cell-placeholder{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .gallery-cell-placeholder .ph-icon{font-size:20px;color:#3a5a88}
+  .gallery-cell-placeholder span{font-family:var(--font-mono);font-size:8px;color:#3a5a88}
+  .gallery-cell-index{position:absolute;bottom:2px;right:4px;font-family:var(--font-mono);font-size:7px;color:rgba(255,255,255,0.3)}
+  .gallery-lightbox{position:fixed;inset:0;z-index:200;background:rgba(0,0,30,0.95);display:none;align-items:center;justify-content:center;cursor:pointer}
+  .gallery-lightbox.open{display:flex}
+  .gallery-lightbox img{max-width:90vw;max-height:85vh;border:2px solid var(--blue-glow);box-shadow:0 0 24px var(--blue-glow)}
+  .gallery-lightbox-ph{color:var(--silver2);font-family:var(--font-mono);font-size:12px;text-align:center;line-height:2}
+
+  /* ── CHARACTER ── */
+  #s-char{background:radial-gradient(ellipse at 20% 80%,#0a1a60 0%,transparent 50%),radial-gradient(ellipse at 80% 10%,#0e2a80 0%,transparent 45%),linear-gradient(160deg,#060e2a 0%,#080c1e 100%);flex-direction:column;overflow:hidden}
+  .char-topbar{width:100%;height:28px;flex-shrink:0;background:linear-gradient(90deg,#0a2aaa,#3a7aee,#0a2aaa);display:flex;align-items:center;padding:0 8px;gap:6px;border-bottom:1px solid var(--blue-glow)}
+  .char-topbar-title{font-family:var(--font-mono);font-size:10px;color:#fff;letter-spacing:2px;flex:1;text-align:center}
+  .char-back-btn{font-family:var(--font-mono);font-size:9px;color:#a0c0ff;cursor:pointer;padding:2px 6px;border:1px solid rgba(255,255,255,0.2);border-radius:2px;background:rgba(0,0,0,0.2)}
+  .char-back-btn:active{background:rgba(255,255,255,0.1)}
+  .char-content{flex:1;overflow:hidden;display:flex;scrollbar-width:thin;scrollbar-color:#1a3a88 #060e1a;align-items:stretch}
+  .char-content::-webkit-scrollbar{width:5px}
+  .char-content::-webkit-scrollbar-track{background:#060e1a}
+  .char-content::-webkit-scrollbar-thumb{background:#1a3a88;border-radius:3px}
+
+  /* Standing — 박스 없이 배경에 자연스럽게 */
+  .char-left{
+    width:42%;min-width:130px;flex-shrink:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+    position:relative;cursor:pointer;
+    /* 좌측 하단에서 이미지가 올라오는 느낌 */
+    align-self:stretch;
+  }
+  .char-standing{
+    /* 박스 완전 제거 — 배경/테두리 없음 */
+    width:100%;flex:1;
+    display:flex;align-items:flex-end;justify-content:center;
+    position:relative;overflow:visible;
+    background:none;border:none;
+  }
+  .char-standing-ph{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;height:100%;width:100%;padding:8px;
+    font-family:var(--font-mono);font-size:8px;color:#2a4a88;text-align:center;
+  }
+  .char-standing-ph .ph-big{font-size:48px;color:#1a3a6a;line-height:1}
+  .char-standing img{
+    /* 이미지 전체가 보이도록 — contain으로 비율 유지, 하단 정렬 */
+    width:100%;
+    max-height:calc(100vh - 28px - 32px); /* topbar + hint 높이 제외 */
+    object-fit:contain;
+    object-position:bottom center;
+    display:block;
+    /* 글리치 효과 유지 + 약간의 발광 */
+    filter:drop-shadow(0 0 8px rgba(100,180,255,0.35));
+    animation:standingGlitch 8s infinite;
+  }
+  @keyframes standingGlitch{
+    0%,90%,100%{filter:drop-shadow(0 0 8px rgba(100,180,255,0.35));transform:translate(0,0)}
+    91%{filter:drop-shadow(0 0 8px rgba(100,180,255,0.35)) hue-rotate(20deg);transform:translate(-2px,0)}
+    92%{filter:drop-shadow(0 0 8px rgba(100,180,255,0.35)) hue-rotate(-15deg);transform:translate(2px,0)}
+    93%{filter:drop-shadow(0 0 8px rgba(100,180,255,0.35));transform:translate(0,0)}
+    96%{filter:drop-shadow(0 0 12px rgba(100,200,255,0.6)) brightness(1.1);transform:translate(1px,0)}
+    97%{filter:drop-shadow(0 0 8px rgba(100,180,255,0.35));transform:translate(0,0)}
+  }
+  .char-click-hint{
+    font-family:var(--font-mono);font-size:7px;color:#2a4a70;text-align:center;
+    padding:4px 0 6px;letter-spacing:.5px;animation:hintPulse 2.5s ease-in-out infinite;
+    flex-shrink:0;
+  }
+  @keyframes hintPulse{0%,100%{opacity:.4}50%{opacity:.9}}
+
+  /* Speech bubble — 이미지 우측에 표시, 상단바에 가리지 않도록 위치 조정 */
+  .speech-bubble{
+    position:absolute;
+    bottom:50%;
+    left:calc(100% + 8px);
+    background:linear-gradient(135deg,rgba(10,30,100,0.97),rgba(5,15,50,0.97));
+    border:1px solid var(--blue-glow);border-radius:2px 8px 8px 8px;
+    padding:8px 10px;max-width:140px;min-width:90px;
+    font-family:var(--font-kr);font-size:16px;color:var(--white);line-height:1.5;
+    pointer-events:none;z-index:50;
+    box-shadow:0 0 12px rgba(0,150,255,0.3);
+    display:none;word-break:keep-all;white-space:pre-wrap;
+  }
+  .speech-bubble::before{content:'';position:absolute;top:10px;left:-7px;border-right:7px solid var(--blue-glow);border-top:5px solid transparent;border-bottom:5px solid transparent}
+  .speech-bubble.show{display:block;animation:bubblePop .15s ease-out}
+  @keyframes bubblePop{0%{transform:scale(0.85)}100%{transform:scale(1)}}
+
+  /* Right panels */
+  .char-right{flex:1;padding:10px 10px 10px 8px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;align-self:flex-start;max-height:100%}
+  .char-right::-webkit-scrollbar{display:none}
+  .info-box{background:linear-gradient(180deg,rgba(20,40,110,0.9),rgba(10,20,60,0.9));border:1px solid #2a4a88;border-radius:4px;overflow:hidden}
+  .info-box-title{height:20px;background:linear-gradient(90deg,var(--win-title-start),var(--win-title-end));display:flex;align-items:center;padding:0 8px}
+  .info-box-title span{font-family:var(--font-mono);font-size:9px;color:#fff;letter-spacing:1px}
+  .info-box-body{padding:8px}
+
+  /* Name (read-only) */
+  .name-display{font-family:var(--font-dos);font-size:28px;color:var(--blue-glow);letter-spacing:3px;text-shadow:0 0 12px var(--blue-glow);text-align:center;padding:6px 0 2px;line-height:1.1}
+  .name-sub{font-family:var(--font-mono);font-size:9px;color:var(--silver2);text-align:center;letter-spacing:2px;margin-bottom:4px}
+  .pixel-divider{height:1px;margin:3px 0;background:repeating-linear-gradient(90deg,transparent,transparent 3px,#1a3a7a 3px,#1a3a7a 6px);opacity:.6}
+  .deco-stars-wrap{display:flex;justify-content:center;gap:8px;padding:4px 0}
+  .deco-star{font-family:var(--font-dos);font-size:12px;color:var(--blue-mid);animation:decoTwinkle var(--dd,2s) ease-in-out infinite}
+  @keyframes decoTwinkle{0%,100%{color:var(--blue-mid);text-shadow:none}50%{color:var(--blue-glow);text-shadow:0 0 6px var(--blue-glow)}}
+
+  /* Stats (read-only) */
+  .stat-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .stat-label{font-family:var(--font-mono);font-size:8px;color:var(--silver2);width:52px;flex-shrink:0;letter-spacing:.5px}
+  .stat-val{flex:1;background:#060e28;border:1px solid #1a3060;border-radius:2px;font-family:var(--font-dos);font-size:14px;color:var(--white);padding:2px 6px;min-height:22px;display:flex;align-items:center}
+  .stat-val-empty{color:#1a3060 !important;font-style:italic}
+
+  /* Tags (read-only) */
+  .tags-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+  .tag{background:rgba(30,60,150,0.5);border:1px solid #3a60a0;border-radius:10px;font-family:var(--font-mono);font-size:8px;color:#90b8ee;padding:2px 8px}
+
+  /* Notes (read-only) */
+  .notes-display{width:100%;min-height:60px;background:#060e28;border:1px solid #1a3060;border-radius:2px;font-family:var(--font-dos);font-size:14px;color:var(--white);padding:6px;line-height:1.6;white-space:pre-wrap;word-break:break-all}
+  .notes-empty{color:#1a3060;font-style:italic}
+
+  /* ── BOOT ── */
+  #s-boot{background:#000;font-family:var(--font-dos);font-size:16px;color:#aaccff;padding:20px;align-items:flex-start;justify-content:flex-start;overflow:hidden;cursor:pointer}
+  .boot-text{line-height:1.7;white-space:pre}
+  .boot-cursor{display:inline-block;width:10px;height:16px;background:#aaccff;animation:blink .6s step-end infinite;vertical-align:bottom}
+
+  .fade-in{animation:fadeIn .35s ease-in-out}
+  @keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+</style>
+</head>
+<body>
+
+<!-- ══ BOOT ══ -->
+<div class="screen active fade-in" id="s-boot">
+  <div class="boot-text" id="boot-text"></div><span class="boot-cursor"></span>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div class="screen" id="s-login">
+  <div class="login-stars" id="stars"></div>
+  <div class="login-top-bar">
+    <span id="sys-time-login">00:00:00</span>
+    <span>DAJEONG LEE v1.0 <span class="blink">_</span></span>
+    <span>🔒 SECURE</span>
+  </div>
+  <div class="login-os-title">PEACEFUL DAJEONG</div>
+  <div class="login-os-sub">ILSAN, GOYANG-SI</div>
+
+  <!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║  🎵 음악 삽입 방법 (제작자용)                             ║
+  ╠══════════════════════════════════════════════════════════╣
+  ║  1. 음악 파일(mp3, ogg 등)을 GitHub 저장소에 업로드       ║
+  ║  2. JS 아래쪽 TRACK_LIST 배열에서 src, title, artist 수정 ║
+  ║     src 예시 (GitHub Raw):                                ║
+  ║     "https://raw.githubusercontent.com/유저명/저장소명/  ║
+  ║      main/music/bgm.mp3"                                 ║
+  ║     src 예시 (같은 폴더):  "music/bgm.mp3"               ║
+  ║  3. 트랙이 여러 개면 객체를 콤마로 이어 추가              ║
+  ╚══════════════════════════════════════════════════════════╝
+  -->
+  <div class="music-player">
+    <div class="mp-title-bar">
+      <span>♪ MEDIA PLAYER</span>
+      <div class="win-btn-grp">
+        <div class="win-btn-sm">-</div>
+        <div class="win-btn-sm">□</div>
+      </div>
+    </div>
+    <div class="mp-body">
+      <div class="mp-track" id="mp-track-name">♪ Loading...</div>
+      <div class="mp-track-sub" id="mp-track-sub">Track — / —</div>
+      <div class="mp-progress" id="mp-progress">
+        <div class="mp-progress-fill" id="mp-fill"></div>
+      </div>
+      <div class="mp-controls">
+        <div class="mp-ctrl-btns">
+          <div class="mp-btn" id="mp-prev">|◄</div>
+          <div class="mp-btn" id="mp-play">►</div>
+          <div class="mp-btn" id="mp-next">►|</div>
+        </div>
+        <div class="mp-vol">
+          <span>VOL</span>
+          <input type="range" min="0" max="100" value="70" id="mp-vol">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-window">
+    <div class="login-title-bar">
+      <span>🔒 LOGIN — STALKER MODE</span>
+      <div class="win-btn-grp"><div class="win-btn-sm">X</div></div>
+    </div>
+    <div class="login-body">
+      <div class="login-avatar">✦</div>
+      <div class="login-name">USER LOGIN</div>
+      <div class="login-input-wrap">
+        <label>USERNAME</label>
+        <input class="login-input" type="text" id="login-user" value="USER">
+      </div>
+      <div class="login-input-wrap">
+        <label>PASSWORD</label>
+        <input class="login-input" type="password" id="login-pass" placeholder="••••••••">
+      </div>
+      <button class="login-btn" id="login-btn">[ LOG IN ]</button>
+      <div class="login-footer">KARYL DOS SYSTEMS © 1999 — ALL RIGHTS RESERVED</div>
+    </div>
+  </div>
+  <div class="login-dots">
+    <div class="login-dot active"></div>
+    <div class="login-dot"></div>
+    <div class="login-dot"></div>
+  </div>
+</div>
+
+<!-- ══ DESKTOP ══ -->
+<div class="screen" id="s-desktop">
+  <div class="desktop-icons">
+    <div class="desktop-icon" id="icon-notepad">
+      <div class="icon-img icon-notepad"><div class="icon-notepad-inner"></div></div>
+      <div class="icon-label">메모장<br>Notepad.exe</div>
+    </div>
+    <div class="desktop-icon" id="icon-gallery">
+      <div class="icon-img icon-gallery">
+        <div class="icon-gallery-grid">
+          <div class="icon-gallery-cell igc1"></div>
+          <div class="icon-gallery-cell igc2"></div>
+          <div class="icon-gallery-cell igc3"></div>
+          <div class="icon-gallery-cell igc4"></div>
+        </div>
+      </div>
+      <div class="icon-label">갤러리<br>Gallery.exe</div>
+    </div>
+    <div class="desktop-icon" id="icon-dajeong">
+      <div class="icon-img icon-dajeong">
+        <div class="icon-dajeong-star">✦</div>
+        <div class="pixel-corner pc-tl"></div><div class="pixel-corner pc-tr"></div>
+        <div class="pixel-corner pc-bl"></div><div class="pixel-corner pc-br"></div>
+      </div>
+      <div class="icon-label">다정<br>Dajeong.exe</div>
+    </div>
+  </div>
+  <div class="taskbar">
+    <div class="tb-start">✦ 시작</div>
+    <div class="tb-sep"></div>
+    <div class="tb-clock" id="tb-clock">00:00<br>0000.00.00</div>
+  </div>
+</div>
+
+<!-- ══ NOTEPAD ══ -->
+<div class="win-overlay" id="win-notepad">
+  <div class="win-box">
+    <div class="win-title">
+      <div class="win-title-text">📝 메모장 — 제목 없음</div>
+      <div class="win-close" id="notepad-close">✕</div>
+    </div>
+    <div id="notepad-menu"><span>파일</span><span>편집</span><span>보기</span></div>
+    <textarea id="notepad-textarea" placeholder="여기에 메모를 입력하세요..."></textarea>
+    <div id="notepad-statusbar">
+      <span id="notepad-pos">Ln 1, Col 1</span>
+      <span>DOS Mode | UTF-8</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GALLERY ══
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  🖼 갤러리 이미지 삽입 방법 (제작자용)                        ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║  아래 4개의 <img> 태그에서 src="" 안을 이미지 경로로 교체     ║
+  ║                                                              ║
+  ║  GitHub Raw URL 예시:                                        ║
+  ║  src="https://raw.githubusercontent.com/유저명/저장소/      ║
+  ║        main/images/photo1.jpg"                               ║
+  ║                                                              ║
+  ║  로컬 상대경로 예시 (HTML과 같은 폴더 내):                    ║
+  ║  src="images/photo1.jpg"                                     ║
+  ╚══════════════════════════════════════════════════════════════╝ -->
+<div class="win-overlay" id="win-gallery">
+  <div class="win-box">
+    <div class="win-title">
+      <div class="win-title-text">🖼 갤러리</div>
+      <div class="win-close" id="gallery-close">✕</div>
+    </div>
+    <div class="gallery-grid">
+
+      <!-- 갤러리 이미지 1 — src="" 안에 이미지 URL 또는 경로 입력 -->
+      <div class="gallery-cell" data-idx="0">
+        <img src="https://raw.githubusercontent.com/yermigionic-web/peace/refs/heads/main/gal1.png" alt="gallery 1" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="gallery-cell-placeholder" style="display:none"><div class="ph-icon">🖼</div><span>이미지 1</span></div>
+        <span class="gallery-cell-index">1</span>
+      </div>
+
+      <!-- 갤러리 이미지 2 -->
+      <div class="gallery-cell" data-idx="1">
+        <img src="https://raw.githubusercontent.com/yermigionic-web/peace/refs/heads/main/gal2.png" alt="gallery 2" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="gallery-cell-placeholder" style="display:none"><div class="ph-icon">🖼</div><span>이미지 2</span></div>
+        <span class="gallery-cell-index">2</span>
+      </div>
+
+      <!-- 갤러리 이미지 3 -->
+      <div class="gallery-cell" data-idx="2">
+        <img src="https://raw.githubusercontent.com/yermigionic-web/peace/refs/heads/main/gal3.png" alt="gallery 3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="gallery-cell-placeholder" style="display:none"><div class="ph-icon">🖼</div><span>이미지 3</span></div>
+        <span class="gallery-cell-index">3</span>
+      </div>
+
+      <!-- 갤러리 이미지 4 -->
+      <div class="gallery-cell" data-idx="3">
+        <img src="https://raw.githubusercontent.com/yermigionic-web/peace/refs/heads/main/gal4.png" alt="gallery 4" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="gallery-cell-placeholder" style="display:none"><div class="ph-icon">🖼</div><span>이미지 4</span></div>
+        <span class="gallery-cell-index">4</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="gallery-lightbox" id="gallery-lightbox"><div id="gallery-lb-content"></div></div>
+
+<!-- ══ CHARACTER
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  ✦ 캐릭터 소개 페이지 편집 가이드 (제작자용)                  ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║  아래 JS의 "제작자 설정 영역"에서 모든 내용을 수정하세요.     ║
+  ║                                                              ║
+  ║  [스탠딩 이미지]                                              ║
+  ║  <img id="char-standing-img"> 의 src="" 에 URL 입력           ║
+  ║  예: src="https://raw.githubusercontent.com/.../stand.png"   ║
+  ║      src="images/standing.png"  (로컬 상대경로)              ║
+  ║                                                              ║
+  ║  [이름 / 스탯 / 태그 / 노트 / 대사]                           ║
+  ║  → 아래 <script> 안 "제작자 설정 영역" 변수들을 수정          ║
+  ╚══════════════════════════════════════════════════════════════╝ -->
+<div class="screen" id="s-char">
+  <div class="char-topbar">
+    <div class="char-back-btn" id="char-back">◄ BACK</div>
+    <div class="char-topbar-title">✦ CHARACTER PROFILE ✦</div>
+    <div style="width:52px"></div>
+  </div>
+
+  <div class="char-content">
+    <div class="char-left" id="char-left">
+      <div class="char-standing" id="char-standing">
+        <!-- 스탠딩 이미지: src="" 안에 이미지 URL 또는 상대경로 입력 -->
+        <img id="char-standing-img"
+          src="https://raw.githubusercontent.com/yermigionic-web/peace/refs/heads/main/fullbody.png"
+          onerror="this.style.display='none';document.getElementById('char-ph').style.display='flex'"
+          onload="this.style.display='block';document.getElementById('char-ph').style.display='none'"
+          alt="캐릭터 스탠딩">
+        <div class="char-standing-ph" id="char-ph" style="display:none">
+          <div class="ph-big">✦</div>
+          <div style="font-size:7px;color:#1a3a5a;letter-spacing:1px">STANDING<br>IMAGE</div>
+        </div>
+      </div>
+      <div class="char-click-hint">[ TOUCH TO TALK ]</div>
+      <div class="speech-bubble" id="speech-bubble"></div>
+    </div>
+
+    <div class="char-right">
+      <div class="info-box">
+        <div class="info-box-title"><span>◆ PEACEFUL DAJEONG</span></div>
+        <div class="info-box-body">
+          <div class="name-display" id="char-name-display"></div>
+          <div class="name-sub" id="char-name-en-display"></div>
+          <div class="pixel-divider"></div>
+          <div class="deco-stars-wrap">
+            <span class="deco-star" style="--dd:1.8s">★</span>
+            <span class="deco-star" style="--dd:2.3s">✦</span>
+            <span class="deco-star" style="--dd:1.5s">★</span>
+            <span class="deco-star" style="--dd:2.8s">✦</span>
+            <span class="deco-star" style="--dd:2.1s">★</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title"><span>◆ DAJEONG INFO</span></div>
+        <div class="info-box-body" id="stats-body"></div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title"><span>◆ NOTES & TAGS</span></div>
+        <div class="info-box-body">
+          <div class="notes-display" id="char-notes-display"></div>
+          <div class="pixel-divider" style="margin-top:6px"></div>
+          <div style="margin-top:5px">
+            <div style="font-family:var(--font-mono);font-size:8px;color:var(--silver2);margin-bottom:4px;letter-spacing:1px">TAGS</div>
+            <div class="tags-wrap" id="tags-wrap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<audio id="mp-audio" loop></audio>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  ✦ 제작자 설정 영역 — 이 부분만 수정하세요
+// ════════════════════════════════════════════════════════
+
+// 🎵 음악 트랙 목록
+// src: GitHub Raw URL 또는 상대경로
+// title: 플레이어에 표시될 트랙 제목
+// artist: 아티스트/출처 표시
+const TRACK_LIST = [
+  {
+    src:    "https://github.com/yermigionic-web/peace/raw/refs/heads/main/azalea.m4a",                   // ← 여기에 음악 파일 URL 입력
+    title:  "고동마을",          // ← 표시될 제목
+    artist: "이치노세 고"            // ← 아티스트명
+  },
+  // 트랙 추가 예시:
+  // { src: "https://raw.githubusercontent.com/유저명/저장소/main/music/track2.mp3", title: "Track 2", artist: "Artist" },
+];
+
+// ✦ 캐릭터 이름 (한글)
+const CHAR_NAME    = "이다정";
+
+// ✦ 캐릭터 이름 (영문 / 서브타이틀)
+const CHAR_NAME_EN = "DAJEONG LEE";
+
+// ✦ 캐릭터 스탯
+// label: 왼쪽 항목 이름, val: 오른쪽에 표시될 값 (비워두면 — 표시)
+const CHAR_STATS = [
+  { label: "성별 / SEX",     val: "여성 / FEMAALE" },   // 예: "여성 / Female"
+  { label: "나이 / AGE",     val: "28세" },   // 예: "17세"
+  { label: "키 / HEIGHT",    val: "174cm" },   // 예: "162cm"
+  { label: "직업 / PROFESSION", val: "무직 (前 수학 과외 교사)" },   // 예: "O형"
+  { label: "스타일 / STYLE", val: "청청패션" },   // 예: "캐주얼, 러블리"
+  { label: "종교 / RELIGION",           val: "기독교......?" },   // 예: "INFP"
+];
+
+// ✦ 태그 목록 (# 자동 추가됨)
+const CHAR_TAGS = ["연상녀", "무심녀", "y2k","부치...?"];
+
+// ✦ 노트 / 캐릭터 설명 (\n 으로 줄바꿈)
+const CHAR_NOTES = "중학교/고등학교 때의 과외 선생님. \n이름에 비해 다정하다기보다는 무심한 사람이었다. \n요즘 그녀를 스토킹하고 있는데... 아무래도 조만간 들킬 것 같다.\n카세트 플레이어 들고 다니는 주제에,\n폰은 애니콜 사용하는 요즘 사람.\n왼쪽의 다정을 눌러 보면 대답해 줄지도.";
+
+// ✦ 랜덤 대사 10개 — 스탠딩 이미지 터치 시 2초간 랜덤 출력
+const CHAR_DIALOGUES = [
+  "……대학은 잘 갔어요?",
+  "아…… 그렇구나.",
+  "……너무 세게 누르지 마세요.",
+  "……닿는 기분, 들어요?",
+  "집에 무슨 일 있어요?",
+  "네…… MSN으로 연락 주세요.",
+  "……우유, 올리브유, 스팸, 만 원에 될까.",
+  "곧…… 선생님이 돼요.",
+  "……수고하셨어요. 마저 수고하세요.",
+  "조만간 라페스타가 완공된대요……",
+];
+
+// ════════════════════════════════════════════════════════
+//  시스템 코드 — 아래는 수정하지 마세요
+// ════════════════════════════════════════════════════════
+
+// BOOT
+const bootLines=["DAJEONG LEE v1.0","Copyright (C) 1999 KARYL DOS SYSTEMS","","Initializing system...","Loading memory of our past... [OK]","Loading teacher data... [OK]","Initializing cassette-player subsystem... [OK]","Mounting Goyang-si... [OK]","",">> Press anywhere to continue <<"];
+let bi=0,ci=0;
+const be=document.getElementById('boot-text');
+function typeBoot(){if(bi>=bootLines.length)return;const l=bootLines[bi];if(ci<l.length){be.textContent+=l[ci++];setTimeout(typeBoot,18);}else{be.textContent+='\n';bi++;ci=0;setTimeout(typeBoot,bi<3?80:40);}}
+typeBoot();
+document.getElementById('s-boot').addEventListener('click',()=>goScreen('s-login'));
+
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);el.classList.add('active','fade-in');
+  setTimeout(()=>el.classList.remove('fade-in'),400);
+}
+
+// Stars
+const se=document.getElementById('stars');
+for(let i=0;i<80;i++){const s=document.createElement('div');s.className='star';s.style.cssText=`width:${Math.random()*3+1}px;height:${Math.random()*3+1}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;--op:${(Math.random()*.7+.3).toFixed(1)};animation-delay:${(Math.random()*5).toFixed(1)}s`;se.appendChild(s);}
+
+// Clock
+function updateClocks(){const n=new Date();const h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');const y=n.getFullYear(),mo=String(n.getMonth()+1).padStart(2,'0'),d=String(n.getDate()).padStart(2,'0');document.getElementById('sys-time-login').textContent=`${h}:${m}:${s}`;document.getElementById('tb-clock').innerHTML=`${h}:${m}<br>${y}.${mo}.${d}`;}
+setInterval(updateClocks,1000);updateClocks();
+
+// Login
+document.getElementById('login-btn').addEventListener('click',()=>goScreen('s-desktop'));
+document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')goScreen('s-desktop');});
+
+// Audio
+const audio=document.getElementById('mp-audio');
+let curTrack=0,isPlaying=false;
+const validTracks=()=>TRACK_LIST.filter(t=>t.src&&t.src.trim()!=='');
+
+function loadTrack(idx){
+  const vt=validTracks();
+  if(!vt.length){document.getElementById('mp-track-name').textContent='♪ No Track';document.getElementById('mp-track-sub').textContent='TRACK_LIST에 src를 입력하세요';return;}
+  curTrack=((idx%vt.length)+vt.length)%vt.length;
+  const t=vt[curTrack];
+  audio.src=t.src;
+  document.getElementById('mp-track-name').textContent='♪ '+t.title;
+  document.getElementById('mp-track-sub').textContent=`${t.artist}  |  Track ${curTrack+1} / ${vt.length}`;
+  if(isPlaying)audio.play().catch(()=>{});
+}
+loadTrack(0);
+document.getElementById('mp-play').addEventListener('click',()=>{if(!validTracks().length)return;if(isPlaying){audio.pause();document.getElementById('mp-play').textContent='►';isPlaying=false;}else{audio.play().catch(()=>{});document.getElementById('mp-play').textContent='⏸';isPlaying=true;}});
+document.getElementById('mp-prev').addEventListener('click',()=>loadTrack(curTrack-1));
+document.getElementById('mp-next').addEventListener('click',()=>loadTrack(curTrack+1));
+document.getElementById('mp-vol').addEventListener('input',function(){audio.volume=this.value/100;});
+audio.addEventListener('timeupdate',()=>{if(audio.duration)document.getElementById('mp-fill').style.width=(audio.currentTime/audio.duration*100)+'%';});
+document.getElementById('mp-progress').addEventListener('click',function(e){if(!audio.duration)return;const r=this.getBoundingClientRect();audio.currentTime=(e.clientX-r.left)/r.width*audio.duration;});
+audio.addEventListener('ended',()=>{if(validTracks().length>1)loadTrack(curTrack+1);});
+
+// Desktop
+document.getElementById('icon-notepad').addEventListener('click',()=>document.getElementById('win-notepad').classList.add('open'));
+document.getElementById('icon-gallery').addEventListener('click',()=>document.getElementById('win-gallery').classList.add('open'));
+document.getElementById('icon-dajeong').addEventListener('click',()=>goScreen('s-char'));
+document.getElementById('notepad-close').addEventListener('click',()=>document.getElementById('win-notepad').classList.remove('open'));
+document.getElementById('gallery-close').addEventListener('click',()=>document.getElementById('win-gallery').classList.remove('open'));
+['win-notepad','win-gallery'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});});
+
+// Notepad
+document.getElementById('notepad-textarea').addEventListener('keyup',function(){const t=this.value.substr(0,this.selectionStart);const ls=t.split('\n');document.getElementById('notepad-pos').textContent=`Ln ${ls.length}, Col ${ls[ls.length-1].length+1}`;});
+
+// Gallery lightbox
+document.querySelectorAll('.gallery-cell').forEach(cell=>{
+  cell.addEventListener('click',()=>{
+    const img=cell.querySelector('img');
+    const lb=document.getElementById('gallery-lightbox');
+    const lbc=document.getElementById('gallery-lb-content');
+    if(img&&img.complete&&img.naturalWidth>0&&img.style.display!=='none'){
+      lbc.innerHTML=`<img src="${img.src}" alt="${img.alt}">`;
+    }else{
+      lbc.innerHTML=`<div class="gallery-lightbox-ph">이미지 ${parseInt(cell.dataset.idx)+1}<br><span style="font-size:10px;color:#3a5a88">src에 이미지를 설정하세요</span></div>`;
+    }
+    lb.classList.add('open');
+  });
+});
+document.getElementById('gallery-lightbox').addEventListener('click',()=>document.getElementById('gallery-lightbox').classList.remove('open'));
+
+// Character back
+document.getElementById('char-back').addEventListener('click',()=>goScreen('s-desktop'));
+
+// Character render (read-only)
+document.getElementById('char-name-display').textContent=CHAR_NAME;
+document.getElementById('char-name-en-display').textContent=CHAR_NAME_EN;
+
+const sb=document.getElementById('stats-body');
+CHAR_STATS.forEach(f=>{
+  const row=document.createElement('div');row.className='stat-row';
+  const empty=!f.val||!f.val.trim();
+  row.innerHTML=`<div class="stat-label">${f.label}</div><div class="stat-val${empty?' stat-val-empty':''}">${empty?'—':f.val}</div>`;
+  sb.appendChild(row);
+});
+
+const nd=document.getElementById('char-notes-display');
+if(!CHAR_NOTES||!CHAR_NOTES.trim()){nd.textContent='(내용 없음)';nd.classList.add('notes-empty');}
+else nd.textContent=CHAR_NOTES;
+
+const tw=document.getElementById('tags-wrap');
+CHAR_TAGS.forEach(t=>{const el=document.createElement('span');el.className='tag';el.textContent='#'+t;tw.appendChild(el);});
+
+// Speech bubble
+let bubbleTimer=null;
+document.getElementById('char-standing').addEventListener('click',()=>{
+  const lines=CHAR_DIALOGUES.filter(d=>d&&d.trim());
+  if(!lines.length)return;
+  const line=lines[Math.floor(Math.random()*lines.length)];
+  const bub=document.getElementById('speech-bubble');
+  bub.textContent=line;bub.classList.add('show');
+  if(bubbleTimer)clearTimeout(bubbleTimer);
+  bubbleTimer=setTimeout(()=>bub.classList.remove('show'),2000);
+});
+
+// Standing image placeholder check
+(function(){
+  const img=document.getElementById('char-standing-img');
+  const ph=document.getElementById('char-ph');
+  const src=img.getAttribute('src');
+  if(!src||src.trim()===''){
+    img.style.display='none';ph.style.display='flex';
+  } else {
+    // src 있으면 ph는 숨기고 onload/onerror가 처리
+    ph.style.display='none';
+  }
+})();
+</script>
+</body>
+</html>
